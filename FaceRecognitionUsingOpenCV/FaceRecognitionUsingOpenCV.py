@@ -19,14 +19,13 @@ subjects = ["", "Ferdinan Kurnianto", "Tikkos"]
 
 
 #function to detect face using OpenCV
-def detect_face(img):
+def detect_face_lbp(img):
     #convert the test image to gray image as opencv face detector expects gray images
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    #load OpenCV face detector, I am using LBP which is fast
-    #there is also a more accurate but slow Haar classifier
+    #load OpenCV face detector, I am using haar in this one
     face_cascade = cv2.CascadeClassifier('opencv-files/lbpcascade_frontalface.xml')
-
+    
     #let's detect multiscale (some images may be closer to camera than others) images
     #result is a list of faces
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5);
@@ -41,6 +40,100 @@ def detect_face(img):
     
     #return only the face part of the image
     return gray[y:y+w, x:x+h], faces[0]
+
+#function to detect face using OpenCV
+def detect_profile_lbp(img):
+    #convert the test image to gray image as opencv face detector expects gray images
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    #load OpenCV face detector, I am using haar in this one
+    profile_cascade = cv2.CascadeClassifier('opencv-files/lbpcascade_profileface.xml')
+    
+    #let's detect multiscale (some images may be closer to camera than others) images
+    #result is a list of profiles
+    profiles = profile_cascade.detectMultiScale(gray, scaleFactor=1.2);
+    
+    #if no profiles are detected then return original img
+    if (len(profiles) == 0):
+        return None, None
+    
+    #under the assumption that there will be only one profile,
+    #extract the profile area
+    (x, y, w, h) = profiles[0]
+    
+    #return only the profile part of the image
+    return gray[y:y+w, x:x+h], profiles[0]
+
+
+#function to detect face using OpenCV
+def detect_face_haar(img):
+    #convert the test image to gray image as opencv face detector expects gray images
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    rect = []
+    #load OpenCV face detector, I am using haar in this one
+    face_cascade = cv2.CascadeClassifier('opencv-files/haarcascade_frontalface_default.xml')
+    
+    #let's detect multiscale (some images may be closer to camera than others) images
+    #result is a list of faces
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5);
+    
+    #if no faces are detected then return original img
+    if (len(faces) == 0):
+        return None, None
+    
+    #extract the face area
+    for i in range(0, len(faces)):
+        (x, y, w, h) = faces[i]
+        rect.append(gray[y:y+w, x:x+h])
+    
+    #return only the face part of the image
+    return rect, faces
+
+#function to detect face using OpenCV
+def detect_face_haar2(img):
+    #convert the test image to gray image as opencv face detector expects gray images
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    #load OpenCV face detector, I am using haar in this one
+    face_cascade = cv2.CascadeClassifier('opencv-files/haarcascade_frontalface_alt2.xml')
+    
+    #let's detect multiscale (some images may be closer to camera than others) images
+    #result is a list of faces
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5);
+    
+    #if no faces are detected then return original img
+    if (len(faces) == 0):
+        return None, None
+    
+    #under the assumption that there will be only one face,
+    #extract the face area
+    (x, y, w, h) = faces[0]
+    
+    #return only the face part of the image
+    return gray[y:y+w, x:x+h], faces[0]
+
+#function to detect face using OpenCV
+def detect_profile_haar(img):
+    #convert the test image to gray image as opencv face detector expects gray images
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    rect = []
+    #load OpenCV face detector, I am using haar in this one
+    profile_cascade = cv2.CascadeClassifier('opencv-files/haarcascade_profileface.xml')
+    
+    #let's detect multiscale (some images may be closer to camera than others) images
+    #result is a list of profiles
+    profiles = profile_cascade.detectMultiScale(gray, scaleFactor=1.2);
+    
+    #if no profiles are detected then return original img
+    if (len(profiles) == 0):
+        return None, None
+    
+    #under the assumption that there will be only one profile,
+    #extract the profile area
+    (x, y, w, h) = profiles[0]
+    rect.append(gray[y:y+w, x:x+h])
+    #return only the profile part of the image
+    return rect, profiles[0]
 
 #this function will read all persons' training images, detect face from each image
 #and will return two lists of exactly same size, one list 
