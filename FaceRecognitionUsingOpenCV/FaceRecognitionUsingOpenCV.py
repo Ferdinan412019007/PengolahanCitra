@@ -3,6 +3,8 @@
 
 # Face Recognition with OpenCV
 
+from array import array
+from multiprocessing.dummy import Array
 #import OpenCV module
 import cv2
 #import os module for reading training data directories and paths
@@ -166,25 +168,20 @@ face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 #train our face recognizer of our training faces
 face_recognizer.train(faces, np.array(labels))
 
-
+test_img=[0]*22
+predicted_img=[0]*22
 print("Predicting images...")
 
-#load test images
-test_img1 = cv2.imread("test-data/test1.jpg")
-test_img2 = cv2.imread("test-data/test2.jpg")
+for x in range(1, len(test_img)):
+    #load test images
+    test_img[x] = cv2.imread("test-data/test"+str(x)+".jpg")
 
-#perform a prediction
-predicted_img1 = predict(test_img1)
-predicted_img2 = predict(test_img2)
-print("Prediction complete")
+    #perform a prediction
+    predicted_img[x] = predict(test_img[x])
+    print("Prediction complete")
 
-#display both images
-cv2.imshow(subjects[1], cv2.resize(predicted_img1, (400, 500)))
-cv2.imshow(subjects[2], cv2.resize(predicted_img2, (400, 500)))
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-cv2.waitKey(1)
-cv2.destroyAllWindows()
+    #save image in output
+    cv2.imwrite('output/lbp/Output'+str(x)+'.png', predicted_img[x])
 
 
 
