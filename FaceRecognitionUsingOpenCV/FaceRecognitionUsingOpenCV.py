@@ -191,14 +191,14 @@ def prepare_training_data(data_folder_path):
             cv2.waitKey(100)
             
             #detect face
-            face, rect = detect_face(image)
+            face, rect = detect_face_haar(image)
             
             #------STEP-4--------
             #for the purpose of this tutorial
             #we will ignore faces that are not detected
             if face is not None:
                 #add face to list of faces
-                faces.append(face)
+                faces.append(face[0])
                 #add label for this face
                 labels.append(label)
             
@@ -224,45 +224,187 @@ def draw_text(img, text, x, y):
 #this function recognizes the person in image passed
 #and draws a rectangle around detected face with name of the 
 #subject
-def predict(test_img):
+def predict_lbp(test_img):
     #make a copy of the image as we don't want to chang original image
     img = test_img.copy()
     #detect face from the image
-    face, rect = detect_face(img)
+    face, rect = detect_face_lbp(img)
 
     #predict the image using our face recognizer 
-    label, confidence = face_recognizer.predict(face)
-    #get name of respective label returned by face recognizer
-    label_text = subjects[label]
-    
-    #draw a rectangle around face detected
-    draw_rectangle(img, rect)
-    #draw name of predicted person
-    draw_text(img, label_text, rect[0], rect[1]-5)
-    
+    try:
+        label, confidence = face_recognizer.predict(face)
+        #get name of respective label returned by face recognizer
+        label_text = subjects[label]
+        
+        #draw a rectangle around face detected
+        draw_rectangle(img, rect)
+        #draw name of predicted person
+        draw_text(img, label_text, rect[0], rect[1]-5)
+    except:
+        print("Prediction failed")
+    return img
+
+def predict_lbp2(test_img):
+    #make a copy of the image as we don't want to chang original image
+    img = test_img.copy()
+    #detect face from the image
+    face, rect = detect_face_lbp(img)
+    if face is None:
+        face, rect = detect_profile_lbp(img)
+
+    #predict the image using our face recognizer 
+    try:
+        label, confidence = face_recognizer.predict(face)
+        #get name of respective label returned by face recognizer
+        label_text = subjects[label]
+        
+        #draw a rectangle around face detected
+        draw_rectangle(img, rect)
+        #draw name of predicted person
+        draw_text(img, label_text, rect[0], rect[1]-5)
+    except:
+        print("Prediction failed")
+    return img
+
+def predict_haar(test_img):
+    #make a copy of the image as we don't want to chang original image
+    img = test_img.copy()
+    #detect face from the image
+    face, rect = detect_face_haar(img)
+
+    #predict the image using our face recognizer 
+    try:
+        label, confidence = face_recognizer.predict(face)
+        #get name of respective label returned by face recognizer
+        label_text = subjects[label]
+        
+        #draw a rectangle around face detected
+        draw_rectangle(img, rect)
+        #draw name of predicted person
+        draw_text(img, label_text, rect[0], rect[1]-5)
+    except:
+        print("Prediction failed")
     return img
 
 
-#let's first prepare our training data
-#data will be in two lists of same size
-#one list will contain all the faces
-#and other list will contain respective labels for each face
+def predict_haar2(test_img):
+    #make a copy of the image as we don't want to chang original image
+    img = test_img.copy()
+    #detect face from the image
+    face, rect = detect_face_haar(img)
+    if face is None:
+        face, rect = detect_profile_haar(img)
 
-print("Preparing data...")
-faces, labels = prepare_training_data("training-data")
-print("Data prepared")
+    #predict the image using our face recognizer 
+    try:
+        label, confidence = face_recognizer.predict(face)
+        #get name of respective label returned by face recognizer
+        label_text = subjects[label]
+        
+        #draw a rectangle around face detected
+        draw_rectangle(img, rect)
+        #draw name of predicted person
+        draw_text(img, label_text, rect[0], rect[1]-5)
+    except:
+        print("Prediction failed")
+    return img
 
-#print total faces and labels
-print("Total faces: ", len(faces))
-print("Total labels: ", len(labels))
+def predict_haar3(test_img):
+    #make a copy of the image as we don't want to chang original image
+    img = test_img.copy()
+    #detect face from the image
+    face, rect = detect_face_haar2(img)
+    if face is None:
+        face, rect = detect_profile_haar(img)
 
-#create our LBPH face recognizer 
-face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-#train our face recognizer of our training faces
-face_recognizer.train(faces, np.array(labels))
+    #predict the image using our face recognizer 
+    try:
+        label, confidence = face_recognizer.predict(face)
+        #get name of respective label returned by face recognizer
+        label_text = subjects[label]
+        
+        #draw a rectangle around face detected
+        draw_rectangle(img, rect)
+        #draw name of predicted person
+        draw_text(img, label_text, rect[0], rect[1]-5)
+    except:
+        print("Prediction failed")
+    return img
+
+def predict_haar4(test_img):
+    #make a copy of the image as we don't want to chang original image
+    img = test_img.copy()
+    imgresult = []
+    #detect face from the image
+    face, rect = detect_face_haar(img)
+    if face is None:
+        face, rect = detect_profile_haar(img)
+    if face is None:
+        img = cv2.flip(img,1)
+        face, rect = detect_profile_haar(img)
+    #predict the image using our face recognizer
+    try:
+        if(len(face)==1 and type(rect[0]) is not np.ndarray):
+            label, confidence = face_recognizer.predict(face[0])
+            #get name of respective label returned by face recognizer
+            label_text = subjects[label]
+                  
+            #draw a rectangle around face detected
+            draw_rectangle(img, rect)
+            #draw name of predicted person
+            draw_text(img, label_text, rect[0], rect[1]-5)
+            (x, y, w, h) = rect
+            img = img[0:y+w+150, x-100:x+h+150]
+            imgresult.append(img)
+    except:
+        print("Prediction failed")
+        imgresult.append(img)
+    try:
+        if(type(rect[0]) is np.ndarray):
+            for i in range(0, len(face)):
+                label, confidence = face_recognizer.predict(face[i])
+                #get name of respective label returned by face recognizer
+                label_text = subjects[label]
+                        
+                #draw a rectangle around face detected
+                draw_rectangle(img, rect[i])
+                #draw name of predicted person
+                draw_text(img, label_text, rect[i][0], rect[i][1]-5)
+                (x, y, w, h) = rect[i]
+                img2 = img[y-70:y+w+150, x-100:x+h+150]
+                imgresult.append(img2)
+    except:
+        print("Prediction failed")
+    return imgresult
+
+
+
+if(os.path.exists('face-recognizer/recognizer.xml')==False):
+    #let's first prepare our training data if we don't have a saved trained model
+    #data will be in two lists of same size
+    #one list will contain all the faces
+    #and other list will contain respective labels for each face
+    print("Preparing data...")
+    faces, labels = prepare_training_data("training-data")
+    print("Data prepared")
+
+    #print total faces and labels
+    print("Total faces: ", len(faces))
+    print("Total labels: ", len(labels))
+    face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+
+    #train our face recognizer of our training faces
+    face_recognizer.train(faces, np.array(labels))
+    #save our trained face recognizer
+    face_recognizer.write('face-recognizer/recognizer.xml')
+else:
+    face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+    #load our trained face recognizer
+    face_recognizer.read('face-recognizer/recognizer.xml')
 
 test_img=[0]*22
 predicted_img=[0]*22
+
 print("Predicting images...")
 
 for x in range(1, len(test_img)):
@@ -270,13 +412,67 @@ for x in range(1, len(test_img)):
     test_img[x] = cv2.imread("test-data/test"+str(x)+".jpg")
 
     #perform a prediction
-    predicted_img[x] = predict(test_img[x])
+    predicted_img[x] = predict_lbp(test_img[x])
     print("Prediction complete")
 
-    #save image in output
+    #display both images
     cv2.imwrite('output/lbp/Output'+str(x)+'.png', predicted_img[x])
 
+for x in range(1, len(test_img)):
+    #load test images
+    test_img[x] = cv2.imread("test-data/test"+str(x)+".jpg")
 
+    #perform a prediction
+    predicted_img[x] = predict_lbp2(test_img[x])
+    print("Prediction complete")
 
+    #display both images
+    cv2.imwrite('output/lbp+profile/Output'+str(x)+'.png', predicted_img[x])
 
+for x in range(1, len(test_img)):
+    #load test images
+    test_img[x] = cv2.imread("test-data/test"+str(x)+".jpg")
 
+    #perform a prediction
+    predicted_img[x] = predict_haar(test_img[x])
+    print("Prediction complete")
+
+    #display both images
+    cv2.imwrite('output/haar/Output'+str(x)+'.png', predicted_img[x])
+
+for x in range(1, len(test_img)):
+    #load test images
+    test_img[x] = cv2.imread("test-data/test"+str(x)+".jpg")
+
+    #perform a prediction
+    predicted_img[x] = predict_haar2(test_img[x])
+    print("Prediction complete")
+
+    #display both images
+    cv2.imwrite('output/haar+profile/Output'+str(x)+'.png', predicted_img[x])
+
+for x in range(1, len(test_img)):
+    #load test images
+    test_img[x] = cv2.imread("test-data/test"+str(x)+".jpg")
+
+    #perform a prediction
+    predicted_img[x] = predict_haar3(test_img[x])
+    print("Prediction complete")
+
+    #display both images
+    cv2.imwrite('output/haar2+profile/Output'+str(x)+'.png', predicted_img[x])
+
+for x in range(1, len(test_img)):
+    #load test images
+    test_img[x] = cv2.imread("test-data/test"+str(x)+".jpg")
+
+    #perform a prediction
+    predicted_img[x] = predict_haar4(test_img[x])
+    print("Prediction complete")
+    #if more than 1 face is predicted, save each face as a different file
+    if(len(predicted_img[x])>1):
+        for i in range(0, len(predicted_img[x])):
+            cv2.imwrite('output/haar+profile+flip/Output'+str(x)+'-'+str(i)+'.png', predicted_img[x][i])
+    #display both images
+    else:
+        cv2.imwrite('output/haar+profile+flip/Output'+str(x)+'.png', predicted_img[x][0])
