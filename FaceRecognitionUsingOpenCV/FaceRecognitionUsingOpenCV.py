@@ -13,7 +13,8 @@ import os
 #it is needed by OpenCV face recognizers
 import numpy as np
 
-
+#chdir in order to adjust path changes
+os.chdir('FaceRecognitionUsingOpenCV/')
 #there is no label 0 in our training data so subject name for index/label 0 is empty
 subjects = ["", "Ferdinan Kurnianto", "Tikkos"]
 
